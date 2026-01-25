@@ -1,7 +1,7 @@
 export async function getUserStories(userId) {
     try {
       const res = await fetch(
-        `http://localhost:5050/api/story/user/${userId}`
+        `${import.meta.env.VITE_API_BASE_URL}/api/story/user/${userId}`
       );
   
       if (!res.ok) {

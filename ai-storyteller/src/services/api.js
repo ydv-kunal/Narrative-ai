@@ -15,7 +15,7 @@
 //   }
 
 export async function generateNextEpisode(data) {
-  const res = await fetch("http://localhost:5050/api/generate", {
+  const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/generate`, {
     
     method: "POST",
     headers: { "Content-Type": "application/json" },

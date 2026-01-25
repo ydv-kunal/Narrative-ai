@@ -1,6 +1,6 @@
 export async function saveStoryToDB(userId, story) {
     try {
-        await fetch("http://localhost:5050/api/story/save", {
+        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story/save`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
