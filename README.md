@@ -1,4 +1,4 @@
-# NarrativeAI 🚀
+# Narrative AI 🚀
 
 An AI-powered interactive storytelling platform where user choices shape the story.
 
