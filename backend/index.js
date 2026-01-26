@@ -30,6 +30,11 @@ mongoose
 const storyRoutes = require("./routes/story");
 app.use("/api/story", storyRoutes);
 
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
+
 
 
 // 7️⃣ Test route (IMPORTANT)
