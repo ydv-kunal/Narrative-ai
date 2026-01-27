@@ -66,6 +66,7 @@ export default function StoryPlayer() {
    
     generateFirstChapter();
   }, [genre, tone, length]);
+  const [loading, setLoading] = useState(false);
 
   
 
@@ -105,7 +106,7 @@ const [scores, setScores] = useState({
 });
 
 const [choiceLocked, setChoiceLocked] = useState(false);
-const [loading, setLoading] = useState(false);
+
 const [thinkingIndex, setThinkingIndex] = useState(0);
 
   useEffect(() => {
@@ -122,16 +123,17 @@ const [thinkingIndex, setThinkingIndex] = useState(0);
 
   const isFallback = storyText?.startsWith("🧠") ;
 
-  const buildPayload = (engineOverride) => ({
-    genre,
-    tone,
-    length,
-    episode,
-    previousChoice,
-    previousSummary,
-    scores,
-    engine: engineOverride || engine,
-  });
+  // const buildPayload = (engineOverride) => ({
+  //   genre,
+  //   tone,
+  //   length,
+  //   episode,
+  //   previousChoice,
+  //   previousSummary,
+  //   scores,
+  //   engine: engineOverride || engine,
+  // });
+  // buildPayload(nextEngine)
   
 
 
@@ -405,10 +407,10 @@ const [thinkingIndex, setThinkingIndex] = useState(0);
 
               if (episode === 1) {
                 // Failed at Chapter 1
-                generateFirstChapter(buildPayload(nextEngine));
+                generateFirstChapter();
               } else {
                 // Failed at Chapter 2+
-                generateNextEpisode(buildPayload(nextEngine));
+                generateNextEpisode();
               }
               
               //generateFirstChapter(nextEngine);

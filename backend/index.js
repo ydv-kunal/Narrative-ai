@@ -44,6 +44,7 @@ app.get("/", (req, res) => {
 
 // 7️⃣ Story generation route
 app.post("/api/generate", async (req, res) => {
+  console.log("🔥 REQUEST BODY:", req.body);
   try {
 
     const {
@@ -54,7 +55,7 @@ app.post("/api/generate", async (req, res) => {
       previousChoice = "Start",
       previousSummary = "",
       scores = { morality: 0, risk: 0, emotion: 0 },
-      engine = "gemini",
+      engine = req.body.engine,
     } = req.body;
 
     //console.log("REQ BODY 👉", req.body);
@@ -90,7 +91,9 @@ Then give EXACTLY 2 choices.
 Each choice must include score effects (between -2 and +2).
 
 Return ONLY valid JSON:
+Do not add any text outside JSON.
 
+Format:
 {
   "storyText": "story here",
   "choices": [
@@ -136,30 +139,34 @@ Return ONLY valid JSON:
           text = await generateStory(engine, prompt);
       } catch (err) {
           return res.status(500).json({
-              error: "AI_TEMP_UNAVAILABLE",
+              error: "AI_TEMP_UNAVAILABLE in generateStory",
           });
       }
+      console.log("🔥 AI RAW RESPONSE:", text);
+      console.log("🔥 TYPE OF RESPONSE:", typeof text);
 
+
+    const safeText = text.replace(/:\s*\+(\d+)/g, ": $1");
 
 
     // 9️⃣ Extract JSON safely
-    const jsonStart = text.indexOf("{");
-    const jsonEnd = text.lastIndexOf("}") + 1;
+    const jsonStart = safeText.indexOf("{");
+    const jsonEnd = safeText.lastIndexOf("}") + 1;
 
     if (jsonStart === -1 || jsonEnd === -1) {
       throw new Error("Invalid AI response format");
     }
 
-    const cleanJson = text.slice(jsonStart, jsonEnd);
+    const cleanJson = safeText.slice(jsonStart, jsonEnd);
     const parsed = JSON.parse(cleanJson);
 
-      if (isFinalChapter) {
-          res.json({
-              storyText: parsed.storyText,
-              choices: [] // story ends
-          });
-          return; // ⛔ VERY IMPORTANT
-      }
+    // if (isFinalChapter) {
+    //   res.json({
+    //     storyText: parsed.storyText,
+    //     choices: [] // story ends
+    //   });
+    //   return; // ⛔ VERY IMPORTANT
+    // }
 
 
     // 🔟 Send response to frontend
@@ -167,7 +174,7 @@ Return ONLY valid JSON:
   } catch (error) {
     console.error("BACKEND FAILURE:", error);
     return res.status(503).json({
-      error: "AI_TEMP_UNAVAILABLE",
+      error: "AI_TEMP_UNAVAILABLE at end",
       //details: error?.message || error
     });
   }
