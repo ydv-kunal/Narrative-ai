@@ -3,6 +3,8 @@
 An AI-powered interactive storytelling platform where user choices shape the story.
 
 <img width="1440" height="757" alt="Screenshot 2026-01-25 at 6 56 02 PM" src="https://github.com/user-attachments/assets/90c3e8f8-65eb-4990-9434-d33d80807394" />
+
+
 <img width="1440" height="770" alt="Screenshot 2026-01-28 at 12 09 47 AM" src="https://github.com/user-attachments/assets/e3be620a-bb7f-4cf1-b831-f8d17c0b8297" />
 
 
