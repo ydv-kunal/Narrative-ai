@@ -16,9 +16,10 @@ export function AuthProvider({ children }) {
 
     return unsubscribe;
   }, []);
-
   return (
-    <AuthContext.Provider value={{ user }}>
+    // Commented out to include both user and loading in context so ProtectedRoute and other subcomponents can consume loading state correctly
+    // <AuthContext.Provider value={{ user }}>
+    <AuthContext.Provider value={{ user, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );

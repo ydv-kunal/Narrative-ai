@@ -19,10 +19,13 @@ export default function StoryPlayer() {
 
   const [episode, setEpisode] = useState(1);
   const [storyText, setStoryText] = useState("");
+  // States added to support fallback retry of choices with previous summary context
+  const [lastChoice, setLastChoice] = useState(null);
+  const [lastStoryText, setLastStoryText] = useState("");
   const firstChapterGenerated = useRef(false);
   //const [engine, setEngine] = useState("gemini");
 
-  const generateFirstChapter = async () => { 
+  const generateFirstChapter = async (engineOverride) => { 
     try {
       setLoading(true);
       const result = await generateNextEpisode({
@@ -33,7 +36,7 @@ export default function StoryPlayer() {
         previousChoice: "Start",
         previousSummary: "",
         scores: { morality: 0, risk: 0, emotion: 0 },
-        engine: engine,
+        engine: engineOverride || engine,
       });
 
       setStoryText(result.storyText);
@@ -207,6 +210,10 @@ const [thinkingIndex, setThinkingIndex] = useState(0);
     // }
 
     // #Number 3 logic
+  // Commented out the original handleChoice function to refactor it to handle engineOverride, 
+  // prevent stale/incorrect score updates before successful api resolution, 
+  // and handle fallback retry with correct previous summary.
+  /*
   async function handleChoice(choice) {
     if (choiceLocked) return;
 
@@ -261,6 +268,80 @@ const [thinkingIndex, setThinkingIndex] = useState(0);
         }
       }
 
+
+    } catch (err) {
+      console.error("Story generation failed:", err);
+    } finally {
+      setLoading(false);
+      setChoiceLocked(false);
+    }
+  }
+  */
+
+  async function handleChoice(choice, engineOverride) {
+    if (choiceLocked) return;
+
+    setChoiceLocked(true);
+    setLoading(true);
+
+    // Save choice context for fallback retry
+    setLastChoice(choice);
+    // If the current storyText is not a fallback error message, keep the actual storyText
+    if (storyText && !storyText.startsWith("🧠")) {
+      setLastStoryText(storyText);
+    }
+
+    const nextScores = {
+      morality: scores.morality + (choice.effects?.morality || 0),
+      risk: scores.risk + (choice.effects?.risk || 0),
+      emotion: scores.emotion + (choice.effects?.emotion || 0),
+    };
+
+    try {
+      const activeSummary = storyText?.startsWith("🧠") ? lastStoryText : storyText;
+
+      // Call backend
+      const result = await generateNextEpisode({
+        genre,
+        tone,
+        length,
+        episode: episode + 1,
+        previousChoice: choice.text,
+        previousSummary: activeSummary,
+        scores: nextScores,
+        engine: engineOverride || engine,
+      });
+
+      if (result.storyText.startsWith("🧠")) {
+        // Fallback occurred, do not increment episode or update scores, just set the fallback text
+        setStoryText(result.storyText);
+        setChoices([]);
+        return;
+      }
+
+      // Success path: Apply scores, increment episode, and update UI
+      setScores(nextScores);
+      setEpisode((prev) => prev + 1);
+      setStoryText(result.storyText);
+      setChoices(result.choices);
+      if (result.scores) {
+        setScores(result.scores);
+      }
+
+      // sending data to DB to save if user is logged in
+      if (user) {
+        if (!result.storyText.includes("The story engine is resting")) {
+          saveStoryToDB(user.uid, {
+            genre,
+            chapters: [
+              {
+                episode: episode + 1,
+                text: result.storyText,
+              },
+            ],
+          });
+        }
+      }
 
     } catch (err) {
       console.error("Story generation failed:", err);
@@ -409,6 +490,7 @@ const [thinkingIndex, setThinkingIndex] = useState(0);
               });
               //setEngine(nextEngine);
 
+              /* Commented out previous buggy logic that crashed because it either called generateFirstChapter without engineOverride parameter or called generateNextEpisode without arguments
               if (episode === 1) {
                 // Failed at Chapter 1
                 generateFirstChapter();
@@ -416,8 +498,12 @@ const [thinkingIndex, setThinkingIndex] = useState(0);
                 // Failed at Chapter 2+
                 generateNextEpisode();
               }
-              
-              //generateFirstChapter(nextEngine);
+              */
+              if (episode === 1) {
+                generateFirstChapter(nextEngine);
+              } else {
+                handleChoice(lastChoice, nextEngine);
+              }
             }}
             className="mt-5 px-4 py-2 rounded-md border border-gray-600
             text-lg font-medium text-gray-300

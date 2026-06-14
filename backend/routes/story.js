@@ -53,7 +53,10 @@ router.get("/user/:userId", async (req, res) => {
     const { userId } = req.params;
 
     const stories = await Story.find({ userId })
-      .sort({ createdAt: 1 }) // newest first
+      // Commented out sort({ createdAt: 1 }) because it sorts in ascending order (oldest first).
+      // We want to retrieve the last 7 stories in descending order (newest first) by using sort({ createdAt: -1 }).
+      // .sort({ createdAt: 1 }) // newest first
+      .sort({ createdAt: -1 })
       .limit(7);
 
     res.json(stories);

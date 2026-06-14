@@ -18,9 +18,14 @@ async function generateWithGemini(prompt) {
     } catch (err) {
         console.error("Gemini failed:", err);
 
+        // Commented out return res.status because 'res' is not defined inside this utility function.
+        // It causes ReferenceError. We throw the error so the caller (index.js) can return the correct response status.
+        throw err;
+        /*
         return res.status(503).json({
             error: "AI_TEMP_UNAVAILABLE"
         });
+        */
     }
 
     const text = aiResult.response.text();

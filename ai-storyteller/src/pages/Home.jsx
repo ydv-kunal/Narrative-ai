@@ -26,13 +26,13 @@ export default function Home() {
 
         {/* Header */}
         <section className="text-center max-w-3xl mx-auto mb-16">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
-          AI Interactive Storytelling
-        </h1>
-        <p className="text-gray-400 text-lg">
-          Create cinematic stories where your choices shape the world, the characters,
-          and the ending.
-        </p>        
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
+            AI Interactive Storytelling
+          </h1>
+          <p className="text-gray-400 text-lg">
+            Create cinematic stories where your choices shape the world, the characters,
+            and the ending.
+          </p>
         </section>
 
 
@@ -57,14 +57,15 @@ export default function Home() {
             </p>
           </div>
         </div>
-        
 
 
 
-{/* remove */}
+
+        {/* remove */}
         {/* Sections */}
+
         <div className="space-y-10">
-        <div>
+          <div>
             <h2 className="text-xl font-semibold mb-4">Choose Genre</h2>
             <p className="text-sm text-white/50 mb-4">
               Each genre creates a different kind of world.
@@ -110,7 +111,7 @@ export default function Home() {
               ))}
             </div>
           </div>
-          
+
 
           <div>
             <h2 className="text-xl font-semibold mb-4">Story Length</h2>
@@ -151,9 +152,9 @@ export default function Home() {
               <AiSelector value={engine} onChange={(val) => setEngine(val)} />
             </div>
           </div>
-          
 
-          
+
+
 
           {/* Start Button */}
           <div className="mt-9 mb-15 flex gap-5 content-center items-center">
@@ -189,22 +190,22 @@ export default function Home() {
 
 
           {/* PREVIEW */}
-        <section className="border border-white/10 rounded-xl p-6">
-          <h3 className="font-semibold mb-3">Preview</h3>
-          <p className="text-white/70 mb-4">
-            You wake up in a dark room.  
-            A strange sound comes from the door.
-          </p>
+          <section className="border border-white/10 rounded-xl p-6">
+            <h3 className="font-semibold mb-3">Preview</h3>
+            <p className="text-white/70 mb-4">
+              You wake up in a dark room.
+              A strange sound comes from the door.
+            </p>
 
-          <div className="flex gap-4">
-            <button className="px-4 py-2 border border-white/20 rounded opacity-50">
-              Open the door
-            </button>
-            <button className="px-4 py-2 border border-white/20 rounded opacity-50">
-              Stay quiet
-            </button>
-          </div>
-        </section>
+            <div className="flex gap-4">
+              <button className="px-4 py-2 border border-white/20 rounded opacity-50">
+                Open the door
+              </button>
+              <button className="px-4 py-2 border border-white/20 rounded opacity-50">
+                Stay quiet
+              </button>
+            </div>
+          </section>
 
 
         </div>

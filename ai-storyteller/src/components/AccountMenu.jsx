@@ -56,8 +56,16 @@ export default function AccountMenu() {
       {open && (
         <div className="text-gray-100 absolute right-0 mt-2 w-40 bg-black border border-white/20 rounded-lg">
           
-          <Link
+          {/* Commented out uppercase /Profile link to align with lowercase /profile route in App.jsx */}
+          {/* <Link
             to="/Profile"
+            className="block px-4 py-2 hover:bg-white/10"
+            onClick={() => setOpen(false)}
+          >
+            Profile
+          </Link> */}
+          <Link
+            to="/profile"
             className="block px-4 py-2 hover:bg-white/10"
             onClick={() => setOpen(false)}
           >

@@ -10,6 +10,10 @@ export default function StoryModal({ story, onClose }) {
     // useEffect(() => {
     //     setIndex(0);
     // }, [story]);
+    // Uncommented and enabled this useEffect to prevent index out-of-bounds crashes when switching between saved stories of different lengths.
+    useEffect(() => {
+        setIndex(0);
+    }, [story]);
 
   const chapter = story.chapters[index];
 

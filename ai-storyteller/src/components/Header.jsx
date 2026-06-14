@@ -72,7 +72,9 @@ export default function Header() {
           <AuthModal onClose={() => setShowAuth(false)} />
         )} */}
 
-        <header className="...">
+        {/* Commented out nested <header> tag to resolve invalid HTML warnings and placeholder className */}
+        {/* <header className="..."> */}
+        <div>
           <div className="flex items-center justify-between gap-3">
             {/* left side logo / links */}
 
@@ -114,7 +116,8 @@ export default function Header() {
             mode={authMode}
             onClose={() => setShowAuth(false)} />
           )}
-        </header>
+        </div>
+        {/* </header> */}
 
 
       </div>
