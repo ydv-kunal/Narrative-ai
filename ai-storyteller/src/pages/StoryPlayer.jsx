@@ -42,15 +42,17 @@ export default function StoryPlayer() {
       
       //sending data to DB to save if user exists (loggined)
       if (user) {
-        saveStoryToDB(user.uid, {
-          genre,
-          chapters: [
-            {
-              episode: 1,
-              text: result.storyText,
-            },
-          ],
-        });
+        if(!result.storyText.includes("The story engine is resting")){
+          saveStoryToDB(user.uid, {
+            genre,
+            chapters: [
+              {
+                episode: 1,
+                text: result.storyText,
+              },
+            ],
+          });
+        }
       }
       
       
@@ -246,15 +248,17 @@ const [thinkingIndex, setThinkingIndex] = useState(0);
 
       //sending data to DB to save if user exists (loggined)
       if (user) {
-        saveStoryToDB(user.uid, {
-          genre,
-          chapters: [
-            {
-              episode: episode + 1,
-              text: result.storyText,
-            },
-          ],
-        });
+        if(!result.storyText.includes("The story engine is resting")){
+          saveStoryToDB(user.uid, {
+            genre,
+            chapters: [
+              {
+                episode: 1,
+                text: result.storyText,
+              },
+            ],
+          });
+        }
       }
 
 
