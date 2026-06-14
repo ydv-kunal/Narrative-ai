@@ -70,7 +70,7 @@ export default function Home() {
               Each genre creates a different kind of world.
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {["Thriller", "Fantasy", "Sci-Fi", "Romance", "Horror", "Crime", "Seductive"].map(
+              {["Thriller", "Fantasy", "Sci-Fi", "Romance", "Horror", "Crime"].map(
                 (genre) => (
                   <button
                     key={genre}
