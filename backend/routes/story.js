@@ -62,15 +62,12 @@ router.post("/save", async (req, res) => {
 });
 
 
-// GET last 2 stories of a user
+// GET last 7 stories of a user
 router.get("/user/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
 
     const stories = await Story.find({ userId })
-      // Commented out sort({ createdAt: 1 }) because it sorts in ascending order (oldest first).
-      // We want to retrieve the last 7 stories in descending order (newest first) by using sort({ createdAt: -1 }).
-      // .sort({ createdAt: 1 }) // newest first
       .sort({ createdAt: -1 })
       .limit(7);
 
@@ -79,54 +76,5 @@ router.get("/user/:userId", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch stories" });
   }
 });
+
 module.exports = router;
-
-
-
-
-// sort({ createdAt: 1 }) //older firse  → ascending order
-// sort({ createdAt: -1 }) // newest first  → descending order
-
-
-
-
-
-
-// const { userId, story } = req.body;
-
-//     // 1️⃣ Safety check
-//     if (!userId || !story?.genre || !story?.chapters ) {
-//       return res.status(400).json({
-//         error: "Missing userId or story",
-//       });
-//     }
-
-//     // 2️⃣ Count how many stories user already has
-//     const count = await Story.countDocuments({ userId });
-
-//     // 3️⃣ If user already has 7 stories → delete oldest one
-//     // Max 7 stories per user
-//     if (count >= 7) {
-//       const oldestStory = await Story.findOne({ userId }).sort({
-//         createdAt: 1,
-//       });
-
-//       if (oldestStory) {
-//         await Story.deleteOne({ _id: oldestStory._id });
-//       }
-//     }
-
-//     // 4️⃣ Save new story
-//     const newStory = new Story({
-//       userId,
-//       genre: story.genre,
-//       chapters: story.chapters,
-//     });
-
-//     await newStory.save();
-
-//     // 5️⃣ Send success response
-//     res.json({
-//       success: true,
-//       message: "Story saved successfully",
-//     });
