@@ -19,11 +19,12 @@ export default function StoryPlayer() {
 
   const [episode, setEpisode] = useState(1);
   const [storyText, setStoryText] = useState("");
+  const [accumulatedChapters, setAccumulatedChapters] = useState([]);
+  const [savedStoryId, setSavedStoryId] = useState(null);
   // States added to support fallback retry of choices with previous summary context
   const [lastChoice, setLastChoice] = useState(null);
   const [lastStoryText, setLastStoryText] = useState("");
   const firstChapterGenerated = useRef(false);
-  //const [engine, setEngine] = useState("gemini");
 
   const generateFirstChapter = async (engineOverride) => { 
     try {
@@ -43,22 +44,21 @@ export default function StoryPlayer() {
       setChoices(result.choices);
       setEpisode(1);
       
+      const firstChapterList = [{ episode: 1, text: result.storyText }];
+      setAccumulatedChapters(firstChapterList);
+
       //sending data to DB to save if user exists (loggined)
       if (user) {
-        if(!result.storyText.includes("The story engine is resting")){
-          saveStoryToDB(user.uid, {
+        if (!result.storyText.includes("The story engine is resting")) {
+          const res = await saveStoryToDB(user.uid, {
             genre,
-            chapters: [
-              {
-                episode: 1,
-                text: result.storyText,
-              },
-            ],
-          });
+            chapters: firstChapterList,
+          }, savedStoryId);
+          if (res?.storyId) {
+            setSavedStoryId(res.storyId);
+          }
         }
       }
-      
-      
     } catch (err) {
       console.error("Failed to generate first chapter:", err);
     } finally {
@@ -70,6 +70,7 @@ export default function StoryPlayer() {
     firstChapterGenerated.current = true;
    
     generateFirstChapter();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [genre, tone, length]);
   const [loading, setLoading] = useState(false);
 
@@ -86,24 +87,7 @@ export default function StoryPlayer() {
 //       effect: "risk", 
 //     },
 //   ]);
-const [choices, setChoices] = useState([
-    {
-      text: "Loading...",
-      effects: {
-        emotion: 2,
-        risk: 1,
-        morality: 0,
-      },
-    },
-    {
-      text: "Loading...",
-      effects: {
-        risk: 3,
-        emotion: -1,
-        morality: 2,
-      },
-    },
-]);
+const [choices, setChoices] = useState([]);
 const [scores, setScores] = useState({
     morality: 0,
     risk: 0,
@@ -124,7 +108,7 @@ const [thinkingIndex, setThinkingIndex] = useState(0);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [loading]);
+  }, [loading, THINKING_MESSAGES.length]);
 
   const isFallback = storyText?.startsWith("🧠") ;
 
@@ -320,26 +304,35 @@ const [thinkingIndex, setThinkingIndex] = useState(0);
       }
 
       // Success path: Apply scores, increment episode, and update UI
+      const nextEpisode = episode + 1;
       setScores(nextScores);
-      setEpisode((prev) => prev + 1);
+      setEpisode(nextEpisode);
       setStoryText(result.storyText);
       setChoices(result.choices);
       if (result.scores) {
         setScores(result.scores);
       }
 
+      const updatedChapters = [
+        ...accumulatedChapters,
+        { episode: nextEpisode, text: result.storyText },
+      ];
+      setAccumulatedChapters(updatedChapters);
+
       // sending data to DB to save if user is logged in
       if (user) {
         if (!result.storyText.includes("The story engine is resting")) {
-          saveStoryToDB(user.uid, {
-            genre,
-            chapters: [
-              {
-                episode: episode + 1,
-                text: result.storyText,
-              },
-            ],
-          });
+          const res = await saveStoryToDB(
+            user.uid,
+            {
+              genre,
+              chapters: updatedChapters,
+            },
+            savedStoryId
+          );
+          if (res?.storyId && !savedStoryId) {
+            setSavedStoryId(res.storyId);
+          }
         }
       }
 
@@ -535,7 +528,7 @@ const [thinkingIndex, setThinkingIndex] = useState(0);
             </button>
           ))}
         </div> */}
-        {!isFallback && choices.length > 0 && (
+        {!loading && !isFallback && choices.length > 0 && (
           <div className="mt-8 space-y-4">
             {choices.map((choice, index) => (
               <button

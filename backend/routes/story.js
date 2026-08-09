@@ -2,19 +2,33 @@ const express = require("express");
 const router = express.Router();
 const Story = require("../models/Story");
 
-// SAVE STORY
+// SAVE / UPDATE STORY
 router.post("/save", async (req, res) => {
   try {
-    const { userId, story } = req.body;
+    const { userId, story, storyId } = req.body;
 
     if (!userId || !story?.genre || !story?.chapters) {
       return res.status(400).json({ error: "Invalid data" });
     }
 
-    // 1️⃣ Count how many story blocks user has
+    // 1️⃣ If storyId provided, try updating existing story
+    if (storyId) {
+      const existing = await Story.findOne({ _id: storyId, userId });
+      if (existing) {
+        existing.chapters = story.chapters;
+        await existing.save();
+        return res.json({
+          success: true,
+          message: "Story updated successfully",
+          storyId: existing._id,
+        });
+      }
+    }
+
+    // 2️⃣ Count how many story blocks user has
     const count = await Story.countDocuments({ userId });
 
-    // 2️⃣ If more than 9 → delete OLDEST story block
+    // 3️⃣ If 9 or more → delete OLDEST story block
     if (count >= 9) {
       const oldestStory = await Story.findOne({ userId }).sort({
         createdAt: 1,
@@ -25,7 +39,7 @@ router.post("/save", async (req, res) => {
       }
     }
 
-    // 3️⃣ ALWAYS create a NEW story block
+    // 4️⃣ Create a NEW story block
     const newStory = new Story({
       userId,
       genre: story.genre,
@@ -37,6 +51,7 @@ router.post("/save", async (req, res) => {
     res.json({
       success: true,
       message: "Story saved successfully",
+      storyId: newStory._id,
     });
   } catch (err) {
     console.error("Save story error:", err);

@@ -1,6 +1,6 @@
-export async function saveStoryToDB(userId, story) {
+export async function saveStoryToDB(userId, story, storyId) {
     try {
-        await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story/save`, {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/story/save`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -8,11 +8,16 @@ export async function saveStoryToDB(userId, story) {
             body: JSON.stringify({
                 userId,
                 story,
+                storyId,
             }),
         });
+        if (res.ok) {
+            return await res.json();
+        }
     } catch (err) {
         console.error("Save story failed", err);
     }
+    return null;
 }
 
 

@@ -160,14 +160,10 @@ Format:
     const cleanJson = safeText.slice(jsonStart, jsonEnd);
     const parsed = JSON.parse(cleanJson);
 
-    // if (isFinalChapter) {
-    //   res.json({
-    //     storyText: parsed.storyText,
-    //     choices: [] // story ends
-    //   });
-    //   return; // ⛔ VERY IMPORTANT
-    // }
-
+    const isFinalChapter = Number(episode) >= totalChapters;
+    if (isFinalChapter) {
+      parsed.choices = [];
+    }
 
     // 🔟 Send response to frontend
     res.json(parsed);

@@ -1,19 +1,13 @@
-import { useState,useEffect } from "react";
+import { useState } from "react";
 
 export default function StoryModal({ story, onClose }) {
   const [index, setIndex] = useState(0);
+  const [prevStory, setPrevStory] = useState(story);
 
-  // safety check
-  //if (!story?.chapters?.length) return null;
-
-    // ✅ reset chapter when new story opens
-    // useEffect(() => {
-    //     setIndex(0);
-    // }, [story]);
-    // Uncommented and enabled this useEffect to prevent index out-of-bounds crashes when switching between saved stories of different lengths.
-    useEffect(() => {
-        setIndex(0);
-    }, [story]);
+  if (prevStory !== story) {
+    setPrevStory(story);
+    setIndex(0);
+  }
 
   const chapter = story.chapters[index];
 
